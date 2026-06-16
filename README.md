@@ -72,9 +72,11 @@ Done. The live site updates by itself.
 
 ## Notes
 
-- **Sound:** browsers only allow audio after the first click/tap, so the
-  ambient "mumble" of the videos starts as soon as you touch the page, then
-  cycles through the clips forever at a low volume.
+- **Sound:** the ambient "mumble" of the videos tries to start on its own when
+  the page loads, and otherwise begins the moment you touch the page. It starts
+  on a random clip at a random point each time, then cycles through the clips
+  forever at a low volume. (Browsers block audio before any interaction, so on a
+  first-ever visit it may wait for your first click/tap.)
 - **Motion:** respects the system "reduce motion" setting — it goes calm/still
   for visitors who ask for that.
 - Nothing is tracked or counted; there is deliberately no "X images" number
