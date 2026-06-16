@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<title>Kunstrum ÆSKEN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="description" content="Kunstrum ÆSKEN. Et kunstnerdrevet mikroudstillingssted i det gamle ishus på Ny Munkegade 24, Aarhus. Antipolitik, situlogi, børnemagt.">
+<meta property="og:title" content="Kunstrum ÆSKEN">
+<meta property="og:description" content="Et taberna spiritus, det sidste stop inden universitetet. Ny Munkegade 24, Aarhus.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg:     #060607;
+    --ink:    #ffffff;
+    --accent: #e0481f;          /* signalrød, brandstationen overfor */
+    --mono:   "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans:   "Archivo", system-ui, sans-serif;
+    --edge:   rgba(255,255,255,.62);
+  }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300;
+    overflow: hidden; -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+  }
+  a { color: inherit; text-decoration: none; }
+  img, video { display: block; max-width: 100%; }
+  ::selection { background: var(--accent); color: #fff; }
+
+  /* ---------------- STAGE ---------------- */
+  .stage { position: fixed; inset: 0; overflow: hidden; }
+
+  /* ---------------- COLLAGE BAGTÆPPE (tetris) ---------------- */
+  .collage {
+    position: absolute; inset: -11%;
+    display: grid; grid-auto-flow: dense; gap: 3px;
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+    grid-auto-rows: 58px;
+    will-change: transform; animation: flow 34s ease-in-out infinite;
+  }
+  @keyframes flow {
+    0%   { transform: translate(0,0) scale(1.06); }
+    25%  { transform: translate(3.2%, -2.4%) scale(1.10); }
+    50%  { transform: translate(-2.8%, 2.8%) scale(1.07); }
+    75%  { transform: translate(2.4%, 3.2%) scale(1.11); }
+    100% { transform: translate(0,0) scale(1.06); }
+  }
+  @media (min-width: 760px) { .collage { grid-template-columns: repeat(auto-fill, minmax(72px,1fr)); grid-auto-rows: 72px; } }
+  .c-cell {
+    margin: 0; padding: 0; border: 0; background: #101012; overflow: hidden; position: relative;
+    cursor: pointer; will-change: transform; animation: tdrift var(--dur,9s) ease-in-out var(--dly,0s) infinite;
+  }
+  .c-cell img, .c-cell video {
+    width: 100%; height: 100%; object-fit: cover; filter: brightness(.62) saturate(.92) contrast(1.02);
+    transition: filter .45s ease, opacity .6s ease; opacity: 1;
+  }
+  .c-cell.swap img, .c-cell.swap video { opacity: 0; }
+  .c-cell:hover img, .c-cell:hover video { filter: brightness(1) saturate(1.05); }
+  .c-cell.c-wide { grid-column: span 2; } .c-cell.c-tall { grid-row: span 2; }
+  .c-cell.c-lg { grid-column: span 2; grid-row: span 2; } .c-cell.c-xl { grid-column: span 3; grid-row: span 3; }
+  .c-cell .vmark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .c-cell .vmark::after { content: "\25B6"; color: #fff; font-size: 1.1rem; text-shadow: 0 1px 10px #000; opacity: .9; }
+  @keyframes tdrift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(var(--dx,0px), var(--dy,0px)) scale(1.05); }
+  }
+
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background:
+      radial-gradient(130% 120% at 50% 45%, transparent 38%, rgba(2,2,3,.62) 100%),
+      linear-gradient(180deg, rgba(2,2,3,.40) 0%, transparent 22%, transparent 78%, rgba(2,2,3,.46) 100%);
+  }
+
+  /* ---------------- FELT MED BOKSE ---------------- */
+  .field { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .box {
+    position: absolute; top: 0; left: 0; will-change: transform; touch-action: none; pointer-events: auto;
+    background: rgba(7,7,8,.66); -webkit-backdrop-filter: blur(13px) saturate(1.15); backdrop-filter: blur(13px) saturate(1.15);
+    border: 1px solid var(--edge); color: var(--ink); cursor: grab;
+    box-shadow: 0 10px 40px rgba(0,0,0,.55); animation: spawn .5s cubic-bezier(.2,.85,.25,1) both;
+  }
+  .box.grab { cursor: grabbing; }
+  .box.dragging { box-shadow: 0 18px 60px rgba(0,0,0,.7); border-color: #fff; }
+  .box.follow { z-index: 6; }
+  .box.media, .box.detail, .box.prose { z-index: 7; }
+  @keyframes spawn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; } }
+  @keyframes vanish { to { opacity: 0; transform: scale(.88); } }
+  .box.out { animation: vanish .32s ease forwards; }
+
+  .kx { font-family: var(--mono); font-size: .64rem; letter-spacing: .28em; text-transform: uppercase; color: var(--accent); }
+  .lab { font-family: var(--mono); letter-spacing: .26em; text-transform: uppercase; }
+
+  /* navbokse (ordene) */
+  .nav { padding: 16px 22px; display: flex; flex-direction: column; gap: 4px; }
+  .nav .word { font-weight: 100; font-size: clamp(1.5rem, 3.4vw, 2.3rem); letter-spacing: .04em; line-height: 1; }
+  .nav .hint { font-family: var(--mono); font-size: .58rem; letter-spacing: .24em; text-transform: uppercase; color: #fff; opacity: .85; }
+  .nav .word .open-mark { color: var(--accent); }
+
+  /* føl-løbende feature */
+  .follow { padding: 22px 26px 24px; display: flex; flex-direction: column; gap: 10px; text-align: left; min-width: min(78vw, 360px); border-color: #fff; }
+  .follow .kx { font-size: .72rem; }
+  .follow .handle { font-weight: 100; font-size: clamp(1.6rem, 5.2vw, 2.7rem); letter-spacing: .03em; line-height: 1; }
+  .follow .handle:hover { color: var(--accent); }
+  .follow .sub { font-family: var(--mono); font-size: .62rem; letter-spacing: .12em; text-transform: uppercase; color: #fff; opacity: .9; }
+
+  /* identitets-tag */
+  .tag { padding: 12px 16px; display: flex; flex-direction: column; gap: 3px; }
+  .tag .nm { font-weight: 100; font-size: 1.35rem; letter-spacing: .16em; }
+  .tag .ad { font-family: var(--mono); font-size: .56rem; letter-spacing: .2em; text-transform: uppercase; opacity: .85; }
+
+  /* streng/arkiv-børn */
+  .leaf { padding: 13px 17px; display: flex; flex-direction: column; gap: 7px; max-width: 230px; }
+  .leaf .lk { font-family: var(--mono); font-size: .56rem; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); }
+  .leaf .lt { font-weight: 300; font-size: 1.12rem; letter-spacing: .02em; line-height: 1.12; }
+  .leaf .pip { font-family: var(--mono); font-size: .54rem; letter-spacing: .2em; text-transform: uppercase; opacity: .8; }
+
+  /* detalje-boks */
+  .detail { width: min(86vw, 340px); border-color: #fff; }
+  .detail .hd { display: flex; align-items: flex-start; gap: 12px; padding: 15px 16px 12px; border-bottom: 1px solid rgba(255,255,255,.28); }
+  .detail .hd .x { margin-left: auto; flex: none; }
+  .detail .body { padding: 14px 18px 18px; }
+  .detail .dk { font-family: var(--mono); font-size: .58rem; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); }
+  .detail .dt { font-weight: 300; font-size: 1.32rem; letter-spacing: .02em; line-height: 1.1; margin: 5px 0 0; }
+  .detail .dm { font-family: var(--mono); font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; opacity: .85; margin-top: 6px; }
+  .detail .db { font-size: .92rem; line-height: 1.5; margin: 0 0 12px; }
+  .detail ul { list-style: none; margin: 0; padding: 0; }
+  .detail li { display: grid; grid-template-columns: 64px 1fr; gap: 10px; padding: 9px 0; border-top: 1px solid rgba(255,255,255,.22); }
+  .detail li .w { font-family: var(--mono); font-size: .56rem; letter-spacing: .1em; text-transform: uppercase; opacity: .9; padding-top: .2em; }
+  .detail li .w.tba { color: var(--accent); opacity: 1; }
+  .detail li .t b { font-weight: 500; font-size: .92rem; }
+  .detail li .t span { display: block; font-size: .82rem; opacity: .85; margin-top: 2px; line-height: 1.4; }
+
+  /* prosa (om) */
+  .prose { width: min(88vw, 380px); border-color: #fff; }
+  .prose .hd { display: flex; align-items: center; padding: 14px 16px 12px; border-bottom: 1px solid rgba(255,255,255,.28); }
+  .prose .body { padding: 14px 18px 18px; }
+  .prose p { margin: 0 0 .9em; font-size: .9rem; line-height: 1.56; }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose i { font-style: italic; }
+
+  /* kontakt */
+  .contact { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .contact .row { font-family: var(--mono); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; }
+  .contact .row b { font-weight: 700; }
+  .contact .links { display: flex; flex-wrap: wrap; gap: 12px; }
+  .contact .links a { font-family: var(--mono); font-size: .6rem; letter-spacing: .18em; text-transform: uppercase; border: 1px solid var(--edge); padding: 6px 10px; }
+  .contact .links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* media-boks (klik på baggrund -> stort) */
+  .media { border-color: #fff; background: #000; padding: 0; }
+  .media .frame { position: relative; }
+  .media img, .media video { width: 100%; height: auto; max-height: 78vh; object-fit: contain; display: block; background: #000; }
+  .media .x { position: absolute; top: 8px; right: 8px; z-index: 2; }
+
+  .x {
+    width: 30px; height: 30px; flex: none; display: grid; place-items: center;
+    background: rgba(7,7,8,.7); border: 1px solid var(--edge); color: #fff; font-size: 1.05rem;
+    line-height: 1; cursor: pointer; font-family: var(--mono);
+  }
+  .x:hover { border-color: var(--accent); color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .c-cell { animation: none; }
+    .collage { animation: none; transform: none; }
+    .box { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="collage" id="collage" aria-hidden="true"></div>
+    <div class="vignette"></div>
+    <div class="field" id="field"></div>
+  </div>
+<script src="data.js"></script>
+<script src="media.js"></script>
+<script>
+(function(){
+  "use strict";
+  var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stage = document.getElementById('stage');
+  var field = document.getElementById('field');
+  var collage = document.getElementById('collage');
+
+  var PROGRAM = window.PROGRAM || [];
+  var ARKIV   = window.ARKIV   || [];
+  var FILES   = window.MEDIA_FILES || [];
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function isVid(n){ return /\.(mp4|webm|mov|m4v)$/i.test(n); }
+  function src(n){ return 'img/feed/' + n; }
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
+
+  /* ============ COLLAGE ============ */
+  var MEDIA = FILES;
+  var shuffled = FILES.slice();
+  var IMGFILES = FILES.filter(function(n){ return !isVid(n); });
+  var VIDFILES = FILES.filter(isVid);
+  for (var i=shuffled.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=shuffled[i]; shuffled[i]=shuffled[j]; shuffled[j]=t; }
+
+  function spanClass(){ var r=Math.random(); return r<0.05?' c-xl': r<0.15?' c-lg': r<0.34?' c-wide': r<0.52?' c-tall':''; }
+  function cellInner(n){
+    if (isVid(n)) return '<video muted playsinline preload="metadata" src="'+src(n)+'#t=0.1"></video><span class="vmark"></span>';
+    return '<img loading="lazy" alt="" src="'+src(n)+'">';
+  }
+  function buildCollage(){
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var cell = W < 760 ? 58 : 72;
+    var cols = Math.ceil((W*1.25)/ (cell+3)) + 2;
+    var rows = Math.ceil((H*1.25)/ (cell+3)) + 3;
+    var count = Math.min(700, cols*rows + cols*2);
+    var html = '';
+    for (var k=0;k<count;k++){
+      var id = shuffled[k % shuffled.length];
+      var dx = (rnd(-18,18)).toFixed(1)+'px', dy=(rnd(-18,18)).toFixed(1)+'px';
+      var dur = rnd(6,13).toFixed(1)+'s', dly = rnd(-10,0).toFixed(1)+'s';
+      html += '<button class="c-cell'+spanClass()+'" type="button" tabindex="-1" data-id="'+id+'"'
+            + ' style="--dx:'+dx+';--dy:'+dy+';--dur:'+dur+';--dly:'+dly+'">'+cellInner(id)+'</button>';
+    }
+    collage.innerHTML = html;
+    var cells = collage.querySelectorAll('.c-cell');
+    cells.forEach(function(c){
+      var im = c.querySelector('img');
+      if (im) im.addEventListener('error', function(){ var nid=pick(IMGFILES); c.dataset.id=nid; im.src=src(nid); });
+    });
+    return cells;
+  }
+  var cells = buildCollage();
+
+  /* mutation: skift billeder + størrelser løbende -> "muterer og skubber sig rundt" */
+  if (!REDUCED){
+    setInterval(function(){
+      if (!cells.length) return;
+      var c = cells[(Math.random()*cells.length)|0];
+      if (c.querySelector('video')) return;
+      var n = pick(IMGFILES);
+      var im = c.querySelector('img'); if(!im) return;
+      c.classList.add('swap');
+      setTimeout(function(){ im.src = src(n); c.dataset.id=n; c.classList.remove('swap'); }, 420);
+    }, 650);
+    // repak: skift størrelser på en hel klynge celler ad gangen -> hele væggen flyder/rykker rundt
+    setInterval(function(){
+      if (!cells.length) return;
+      var batch = 5 + (Math.random()*5|0);
+      for (var n=0;n<batch;n++){
+        var c = cells[(Math.random()*cells.length)|0];
+        c.className = 'c-cell' + spanClass();
+        c.style.setProperty('--dx', rnd(-18,18).toFixed(1)+'px');
+        c.style.setProperty('--dy', rnd(-18,18).toFixed(1)+'px');
+      }
+    }, 1500);
+  }
+
+  /* ============ BOX-MOTOR ============ */
+  var boxes = [];
+  function measure(b){ b.w = b.el.offsetWidth; b.h = b.el.offsetHeight; }
+  function render(b){ b.el.style.transform = 'translate(' + b.x + 'px,' + b.y + 'px)'; }
+  function clamp(v,a,c){ return v<a?a:v>c?c:v; }
+
+  function place(b, fx, fy){
+    var W = stage.clientWidth, H = stage.clientHeight;
+    measure(b);
+    b.x = clamp(fx*W - b.w/2, 8, W - b.w - 8);
+    b.y = clamp(fy*H - b.h/2, 8, H - b.h - 8);
+    render(b);
+  }
+
+  function makeBox(html, cls, opts){
+    opts = opts || {};
+    var el = document.createElement('div');
+    el.className = 'box ' + (cls||'');
+    el.innerHTML = html;
+    field.appendChild(el);
+    var b = {
+      el: el, x: 0, y: 0,
+      vx: rnd(-.18,.18), vy: rnd(-.18,.18),
+      max: opts.max != null ? opts.max : 0.26,
+      jit: opts.jit != null ? opts.jit : 0.014,
+      down:false, dragging:false, onClick: opts.onClick || null,
+      w:0, h:0
+    };
+    measure(b);
+    boxes.push(b);
+    enableDrag(b);
+    return b;
+  }
+  function removeBox(b){
+    var idx = boxes.indexOf(b); if (idx<0) return;
+    boxes.splice(idx,1);
+    b.el.classList.add('out');
+    setTimeout(function(){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); }, 320);
+  }
+
+  function enableDrag(b){
+    var el = b.el;
+    el.addEventListener('pointerdown', function(e){
+      if (e.target.closest('a, .x, video, input, button.real')) return;
+      if (e.pointerType==='mouse' && e.button!==0) return;
+      b.down = true; b.moved = false;
+      b.px = e.clientX; b.py = e.clientY;
+      b.gx = e.clientX - b.x; b.gy = e.clientY - b.y;
+      try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      el.classList.add('grab');
+    });
+    el.addEventListener('pointermove', function(e){
+      if (!b.down) return;
+      if (!b.moved && (Math.abs(e.clientX-b.px)+Math.abs(e.clientY-b.py) > 4)){ b.moved=true; b.dragging=true; el.classList.add('dragging'); }
+      if (b.dragging){
+        var W = stage.clientWidth, H = stage.clientHeight;
+        b.x = clamp(e.clientX - b.gx, 0, W - b.w);
+        b.y = clamp(e.clientY - b.gy, 0, H - b.h);
+        b.vx = 0; b.vy = 0; render(b);
+      }
+    });
+    function up(e){
+      if (!b.down) return;
+      b.down = false; el.classList.remove('grab','dragging');
+      try{ el.releasePointerCapture(e.pointerId); }catch(_){}
+      if (b.dragging){ b.dragging=false; b.vx = rnd(-.15,.15); b.vy = rnd(-.15,.15); }
+      else if (b.onClick){ b.onClick(b); }
+    }
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  }
+
+  function tick(){
+    var W = stage.clientWidth, H = stage.clientHeight;
+    for (var i=0;i<boxes.length;i++){
+      var b = boxes[i];
+      if (b.down || b.dragging || b.pinned) continue;
+      b.vx += (Math.random()-0.5) * b.jit;
+      b.vy += (Math.random()-0.5) * b.jit;
+      b.vx = clamp(b.vx, -b.max, b.max);
+      b.vy = clamp(b.vy, -b.max, b.max);
+      b.x += b.vx; b.y += b.vy;
+      if (b.x < 0){ b.x = 0; b.vx = Math.abs(b.vx); }
+      else if (b.x > W - b.w){ b.x = W - b.w; b.vx = -Math.abs(b.vx); }
+      if (b.y < 0){ b.y = 0; b.vy = Math.abs(b.vy); }
+      else if (b.y > H - b.h){ b.y = H - b.h; b.vy = -Math.abs(b.vy); }
+      render(b);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ============ INDHOLDET ============ */
+  var IG = 'https://www.instagram.com/aesken.antipolitik/';
+
+  // FØLG LØBENDE (afløser forsidebilledet/ÆSKEN-titlen, ligger højt)
+  var follow = makeBox(
+    '<span class="kx">Følg løbende</span>'
+    + '<a class="handle" href="'+IG+'" target="_blank" rel="noopener">@aesken.antipolitik</a>'
+    + '<span class="sub">Ferniseringer &middot; dokumentation &middot; annonceringer</span>',
+    'follow', { max: 0.18, jit: 0.010 });
+  follow.el.querySelector('a').addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+  place(follow, 0.5, 0.16);
+
+  // identitets-tag = ÅBNER "Om" (klik på ÆSKEN)
+  var tag = makeBox('<span class="nm">ÆSKEN<span class="open-mark"></span></span><span class="ad">Kunstrum &middot; Aarhus &middot; om</span>', 'tag',
+    { max:0.22, onClick:function(b){ toggleOm(b); } });
+  place(tag, 0.12, 0.10);
+  var omState = { open:false, ref:null };
+  function toggleOm(b){
+    var mark = b.el.querySelector('.open-mark');
+    if (omState.open && omState.ref){ removeBox(omState.ref); omState.ref=null; omState.open=false; if(mark) mark.textContent=''; return; }
+    omState.open = true; if(mark) mark.textContent=' −';
+    var html =
+      '<div class="hd"><span class="kx">Om ÆSKEN</span><button class="x" aria-label="Luk" style="margin-left:auto">&times;</button></div>'
+      + '<div class="body">'
+      + '<p>Måske kender I det som det æskeformede ishus på 10 m² overfor brandstationen, hvis vinduesparti med skænk tiltrækker nysgerrige blikke på vandring mellem midtby og universitetscampus.</p>'
+      + '<p>ÆSKEN er opkaldt efter et legendarisk værtshus i Øgaderne, der over Forlaget Modtryk finansierede revolutionære publikationer og samlede byens radikale miljøer i 1970erne. I røgskyerne finder vi den dada-marxistiske Sammenslutning af Bevidst Arbejdssky Elementer, SABAE. Under parolen <i>hvis arbejde er sundt, så giv det til de syge</i> udfordrede de arbejdet og parlamentet.</p>'
+      + '<p>Et mikroudstillingssted og samlingssted for læse-handle-kredse, digtoplæsninger, anti-workshops og kunstnerdrevne forskningsaktiviteter. En antipolitik fra neden. Vinduet er synligt fra gaden døgnet rundt; åbningstider annonceres løbende på Instagram.</p>'
+      + '<p>Faciliteret af Asker Bryld Staunæs, Benjamin Asger Krog Møller, Matilde Mørk og Tobias Dias. Med tak til Aarhus Kommunes Kulturudviklingspulje.</p>'
+      + '</div>';
+    var pb = makeBox(html, 'prose', { max:0.14, jit:0.008 });
+    pb.el.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); removeBox(pb); omState.open=false; omState.ref=null; if(mark) mark.textContent=''; });
+    place(pb, clamp((b.x+b.w/2)/stage.clientWidth, .25, .7), 0.5);
+    omState.ref = pb;
+  }
+
+  // detalje-boks (streng/arkiv/leaf)
+  function spawnDetail(u, fromBox){
+    var items = (u.items||[]).map(function(it){
+      return '<li><span class="w '+(it.tba?'tba':'')+'">'+esc(it.when)+'</span>'
+           + '<span class="t"><b>'+esc(it.what)+'</b>'+(it.sub?'<span>'+esc(it.sub)+'</span>':'')+'</span></li>';
+    }).join('');
+    var html =
+      '<div class="hd"><div><div class="dk">'+esc(u.kind)+'</div><h3 class="dt">'+esc(u.title)+'</h3>'
+      + (u.meta||u.statusLabel ? '<div class="dm">'+esc(u.meta||u.statusLabel)+'</div>' : '')
+      + '</div><button class="x" aria-label="Luk">&times;</button></div>'
+      + '<div class="body">' + (u.blurb?'<p class="db">'+esc(u.blurb)+'</p>':'') + (items?'<ul>'+items+'</ul>':'') + '</div>';
+    var b = makeBox(html, 'detail', { max:0.16, jit:0.009 });
+    b.el.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); removeBox(b); });
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var fx = fromBox ? (fromBox.x + fromBox.w/2)/W : rnd(.3,.7);
+    var fy = fromBox ? (fromBox.y + fromBox.h/2)/H : rnd(.35,.65);
+    place(b, clamp(fx + rnd(-.06,.06), .15, .85), clamp(fy + rnd(-.04,.04), .15, .8));
+    return b;
+  }
+
+  // klynge (PROGRAM / ARKIV) der løsriver børn der vandrer
+  function makeCluster(word, hint, list, fx, fy){
+    var state = { open:false, kids:[] };
+    var box = makeBox(
+      '<span class="word">'+word+'<span class="open-mark"></span></span><span class="hint">'+hint+'</span>',
+      'nav', { max:0.22, onClick:function(b){ toggle(b); } });
+    place(box, fx, fy);
+    function toggle(b){
+      if (state.open){
+        state.kids.forEach(removeBox); state.kids = []; state.open=false;
+        b.el.querySelector('.open-mark').textContent = '';
+        return;
+      }
+      state.open = true;
+      b.el.querySelector('.open-mark').textContent = ' −';
+      var W = stage.clientWidth, H = stage.clientHeight;
+      var cx = (b.x + b.w/2)/W, cy = (b.y + b.h/2)/H;
+      list.forEach(function(u, idx){
+        var html = '<span class="lk">'+esc(u.kind)+'</span><span class="lt">'+esc(u.title)+'</span>'
+                 + '<span class="pip">'+esc(u.statusLabel||'')+'</span>';
+        var leaf = makeBox(html, 'leaf', { max:0.30, jit:0.018, onClick:function(){ spawnDetail(u, leaf); } });
+        var ang = (idx/list.length)*Math.PI*2 + rnd(-.3,.3);
+        var rad = rnd(0.10, 0.20);
+        leaf.vx = Math.cos(ang)*0.5; leaf.vy = Math.sin(ang)*0.5;   // lille impuls -> de spredes
+        place(leaf, clamp(cx + Math.cos(ang)*rad, .1, .9), clamp(cy + Math.sin(ang)*rad, .12, .85));
+        state.kids.push(leaf);
+      });
+    }
+    return box;
+  }
+
+  makeCluster('Program', 'Klik &middot; tre strenge', PROGRAM, 0.20, 0.46);
+  makeCluster('Arkiv', 'Klik &middot; pilot 2025', ARKIV, 0.78, 0.34);
+
+
+  // KONTAKT
+  var contact = makeBox(
+    '<div class="row"><b>Kunstrum ÆSKEN</b></div>'
+    + '<div class="row">Ny Munkegade 24, st. &middot; 8000 Aarhus C</div>'
+    + '<div class="links"><a href="'+IG+'" target="_blank" rel="noopener">Instagram</a>'
+    + '<a href="mailto:aabnsluserne@gmail.com">Kontakt</a>'
+    + '<a href="https://www.google.com/maps/search/?api=1&query=Ny+Munkegade+24+8000+Aarhus" target="_blank" rel="noopener">Kort</a></div>',
+    'contact', { max:0.2 });
+  contact.el.querySelectorAll('a').forEach(function(a){ a.addEventListener('pointerdown', function(e){ e.stopPropagation(); }); });
+  place(contact, 0.78, 0.72);
+
+  // MEDIE-BOKS: tap på et kollagebillede -> stort i midten; træk -> en kopi rives ud og kan køres rundt.
+  function spawnMedia(id, opts){
+    opts = opts || {};
+    var inner = isVid(id)
+      ? '<video src="'+src(id)+'" controls autoplay playsinline loop></video>'
+      : '<img src="'+src(id)+'" alt="ÆSKEN">';
+    var b = makeBox('<div class="frame">'+inner+'<button class="x" aria-label="Luk">&times;</button></div>', 'media', { max:0.13, jit:0.007 });
+    b.el.style.width = 'min(70vw, 460px)';
+    b.pinned = !!opts.pinned;
+    var media = b.el.querySelector('img, video');
+    b.el.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); if (media.tagName==='VIDEO') duckAmbient(false); removeBox(b); });
+    if (media.tagName==='VIDEO'){ media.volume = 0.9; duckAmbient(true); media.addEventListener('pause', function(){ duckAmbient(false); }); }
+    function position(){
+      measure(b);
+      var W = stage.clientWidth, H = stage.clientHeight;
+      if (b.pinned){ b.x = clamp(b.x, 0, W-b.w); b.y = clamp(b.y, 0, H-b.h); render(b); return; }
+      if (opts.at){ b.x = clamp(opts.at.x - b.w/2, 0, W-b.w); b.y = clamp(opts.at.y - b.h/2, 0, H-b.h); render(b); }
+      else place(b, rnd(.32,.68), rnd(.34,.66));
+    }
+    if (opts.at){ b.x = opts.at.x; b.y = opts.at.y; }
+    if (media.tagName==='IMG'){ if (media.complete) position(); else media.addEventListener('load', position); }
+    else { media.addEventListener('loadedmetadata', position); }
+    position();
+    return b;
+  }
+
+  // KOLLAGE-INTERAKTION (delegeret, én gang): tap = stort, træk = riv kopi ud. Cellerne bliver i væggen, så den altid er fuld.
+  (function(){
+    var pd = null;
+    collage.addEventListener('pointerdown', function(e){
+      var cell = e.target.closest('.c-cell'); if (!cell) return;
+      pd = { id: cell.dataset.id, x0: e.clientX, y0: e.clientY, box: null, dragging: false, pid: e.pointerId };
+      try{ collage.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    collage.addEventListener('pointermove', function(e){
+      if (!pd) return;
+      if (!pd.dragging && (Math.abs(e.clientX-pd.x0)+Math.abs(e.clientY-pd.y0) > 6)){
+        pd.dragging = true;
+        pd.box = spawnMedia(pd.id, { at:{ x:e.clientX, y:e.clientY }, pinned:true });
+      }
+      if (pd.dragging && pd.box){
+        var b = pd.box, W = stage.clientWidth, H = stage.clientHeight;
+        b.x = clamp(e.clientX - b.w/2, 0, W-b.w);
+        b.y = clamp(e.clientY - b.h/2, 0, H-b.h);
+        b.vx = 0; b.vy = 0; render(b);
+      }
+    });
+    function end(){
+      if (!pd) return;
+      try{ collage.releasePointerCapture(pd.pid); }catch(_){}
+      if (!pd.dragging){ spawnMedia(pd.id); }
+      else if (pd.box){ pd.box.pinned = false; pd.box.vx = rnd(-.15,.15); pd.box.vy = rnd(-.15,.15); }
+      pd = null;
+    }
+    collage.addEventListener('pointerup', end);
+    collage.addEventListener('pointercancel', end);
+  })();
+
+  /* ============ MUMLETRACK (ambient lyd fra videoernes lydspor, kører uendeligt) ============ */
+  var duckAmbient = function(){};
+  (function(){
+    if (!VIDFILES.length) return;
+    var queue = VIDFILES.slice();
+    for (var i=queue.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=queue[i]; queue[i]=queue[j]; queue[j]=t; }
+    var qi = 0, started = false, ducked = false;
+    var amb = document.createElement('audio');
+    amb.preload = 'auto'; amb.setAttribute('aria-hidden','true'); amb.style.display='none';
+    document.body.appendChild(amb);
+    var BASE = 0.34;
+    amb.volume = BASE;
+    function nextSrc(){ var f = queue[qi % queue.length]; qi++; amb.src = src(f); amb.play().catch(function(){}); }
+    amb.addEventListener('ended', nextSrc);
+    amb.addEventListener('error', nextSrc);
+    duckAmbient = function(on){ ducked = on; amb.volume = on ? 0.06 : BASE; };
+    function start(){ if (started) return; started = true; nextSrc(); }
+    // browsere kræver en brugerhandling før lyd — start ved første berøring/klik/tast
+    ['pointerdown','keydown','touchstart'].forEach(function(ev){
+      window.addEventListener(ev, start, { once:true });
+    });
+  })();
+
+  /* ============ START ============ */
+  if (!REDUCED) requestAnimationFrame(tick);
+
+  var rt;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      cells = buildCollage();
+      var W = stage.clientWidth, H = stage.clientHeight;
+      boxes.forEach(function(b){ measure(b); b.x = clamp(b.x, 0, W-b.w); b.y = clamp(b.y, 0, H-b.h); render(b); });
+    }, 300);
+  });
+})();
+</script>
+</body>
+</html>
