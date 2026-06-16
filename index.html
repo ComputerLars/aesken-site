@@ -141,6 +141,11 @@
   .prose p { margin: 0 0 .9em; font-size: .9rem; line-height: 1.56; }
   .prose p:last-child { margin-bottom: 0; }
   .prose i { font-style: italic; }
+  .prose .omcontact { margin-top: 14px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,.28); }
+  .prose .omrow { font-family: var(--mono); font-size: .58rem; letter-spacing: .14em; text-transform: uppercase; opacity: .85; margin-bottom: 10px; }
+  .prose .links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .prose .links a { font-family: var(--mono); font-size: .58rem; letter-spacing: .16em; text-transform: uppercase; border: 1px solid var(--edge); padding: 6px 10px; }
+  .prose .links a:hover { border-color: var(--accent); color: var(--accent); }
 
   /* kontakt */
   .contact { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
@@ -206,14 +211,14 @@
   function spanClass(){ var r=Math.random(); return r<0.05?' c-xl': r<0.15?' c-lg': r<0.34?' c-wide': r<0.52?' c-tall':''; }
   function cellInner(n){
     if (isVid(n)) return '<video muted playsinline preload="metadata" src="'+src(n)+'#t=0.1"></video><span class="vmark"></span>';
-    return '<img loading="lazy" alt="" src="'+src(n)+'">';
+    return '<img alt="" decoding="async" data-src="'+src(n)+'">';
   }
   function buildCollage(){
     var W = stage.clientWidth, H = stage.clientHeight;
     var cell = W < 760 ? 58 : 72;
-    var cols = Math.ceil((W*1.25)/ (cell+3)) + 2;
-    var rows = Math.ceil((H*1.25)/ (cell+3)) + 3;
-    var count = Math.min(700, cols*rows + cols*2);
+    var cols = Math.ceil((W*1.15)/ (cell+3)) + 2;
+    var rows = Math.ceil((H*1.15)/ (cell+3)) + 3;
+    var count = Math.min(420, cols*rows + cols);
     var html = '';
     for (var k=0;k<count;k++){
       var id = shuffled[k % shuffled.length];
@@ -226,9 +231,29 @@
     var cells = collage.querySelectorAll('.c-cell');
     cells.forEach(function(c){
       var im = c.querySelector('img');
-      if (im) im.addEventListener('error', function(){ var nid=pick(IMGFILES); c.dataset.id=nid; im.src=src(nid); });
+      if (im) im.addEventListener('error', function(){ var nid=pick(IMGFILES); c.dataset.id=nid; im.removeAttribute('data-src'); im.src=src(nid); });
     });
+    loadProgressively(cells);
     return cells;
+  }
+  // Progressiv indlæsning: tænd billederne i små bobler i stedet for alle på én gang.
+  // Cellerne står mørke og fyldes ind — siden føles hurtig, og browseren drukner ikke i 250 kald.
+  function loadProgressively(cells){
+    var imgs = [];
+    cells.forEach(function(c){ var im = c.querySelector('img[data-src]'); if (im) imgs.push(im); });
+    // bland så de fyldes ind spredt over fladen, ikke række for række
+    for (var i=imgs.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=imgs[i]; imgs[i]=imgs[j]; imgs[j]=t; }
+    var idx = 0, BATCH = 16, GAP = 55;
+    function chunk(){
+      var n = 0;
+      while (idx < imgs.length && n < BATCH){
+        var im = imgs[idx++];
+        if (im.dataset.src){ im.src = im.dataset.src; im.removeAttribute('data-src'); }
+        n++;
+      }
+      if (idx < imgs.length) setTimeout(chunk, GAP);
+    }
+    chunk();
   }
   var cells = buildCollage();
 
@@ -366,8 +391,7 @@
   // FØLG LØBENDE (afløser forsidebilledet/ÆSKEN-titlen, ligger højt)
   var follow = makeBox(
     '<span class="kx">Følg løbende</span>'
-    + '<a class="handle" href="'+IG+'" target="_blank" rel="noopener">@aesken.antipolitik</a>'
-    + '<span class="sub">Ferniseringer &middot; dokumentation &middot; annonceringer</span>',
+    + '<a class="handle" href="'+IG+'" target="_blank" rel="noopener">@aesken.antipolitik</a>',
     'follow', { max: 0.18, jit: 0.010 });
   follow.el.querySelector('a').addEventListener('pointerdown', function(e){ e.stopPropagation(); });
   place(follow, 0.5, 0.16);
@@ -388,8 +412,15 @@
       + '<p>ÆSKEN er opkaldt efter et legendarisk værtshus i Øgaderne, der over Forlaget Modtryk finansierede revolutionære publikationer og samlede byens radikale miljøer i 1970erne. I røgskyerne finder vi den dada-marxistiske Sammenslutning af Bevidst Arbejdssky Elementer, SABAE. Under parolen <i>hvis arbejde er sundt, så giv det til de syge</i> udfordrede de arbejdet og parlamentet.</p>'
       + '<p>Et mikroudstillingssted og samlingssted for læse-handle-kredse, digtoplæsninger, anti-workshops og kunstnerdrevne forskningsaktiviteter. En antipolitik fra neden. Vinduet er synligt fra gaden døgnet rundt; åbningstider annonceres løbende på Instagram.</p>'
       + '<p>Faciliteret af Asker Bryld Staunæs, Benjamin Asger Krog Møller, Matilde Mørk og Tobias Dias. Med tak til Aarhus Kommunes Kulturudviklingspulje.</p>'
+      + '<div class="omcontact">'
+      +   '<div class="omrow">Ny Munkegade 24, st. &middot; 8000 Aarhus C</div>'
+      +   '<div class="links"><a href="'+IG+'" target="_blank" rel="noopener">Instagram</a>'
+      +   '<a href="mailto:aabnsluserne@gmail.com">Kontakt</a>'
+      +   '<a href="https://www.google.com/maps/search/?api=1&query=Ny+Munkegade+24+8000+Aarhus" target="_blank" rel="noopener">Kort</a></div>'
+      + '</div>'
       + '</div>';
     var pb = makeBox(html, 'prose', { max:0.14, jit:0.008 });
+    pb.el.querySelectorAll('a').forEach(function(a){ a.addEventListener('pointerdown', function(e){ e.stopPropagation(); }); });
     pb.el.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); removeBox(pb); omState.open=false; omState.ref=null; if(mark) mark.textContent=''; });
     place(pb, clamp((b.x+b.w/2)/stage.clientWidth, .25, .7), 0.5);
     omState.ref = pb;
@@ -419,7 +450,7 @@
   function makeCluster(word, hint, list, fx, fy){
     var state = { open:false, kids:[] };
     var box = makeBox(
-      '<span class="word">'+word+'<span class="open-mark"></span></span><span class="hint">'+hint+'</span>',
+      '<span class="word">'+word+'<span class="open-mark"></span></span>'+(hint?'<span class="hint">'+hint+'</span>':''),
       'nav', { max:0.22, onClick:function(b){ toggle(b); } });
     place(box, fx, fy);
     function toggle(b){
@@ -446,20 +477,8 @@
     return box;
   }
 
-  makeCluster('Program', 'Klik &middot; tre strenge', PROGRAM, 0.20, 0.46);
-  makeCluster('Arkiv', 'Klik &middot; pilot 2025', ARKIV, 0.78, 0.34);
-
-
-  // KONTAKT
-  var contact = makeBox(
-    '<div class="row"><b>Kunstrum ÆSKEN</b></div>'
-    + '<div class="row">Ny Munkegade 24, st. &middot; 8000 Aarhus C</div>'
-    + '<div class="links"><a href="'+IG+'" target="_blank" rel="noopener">Instagram</a>'
-    + '<a href="mailto:aabnsluserne@gmail.com">Kontakt</a>'
-    + '<a href="https://www.google.com/maps/search/?api=1&query=Ny+Munkegade+24+8000+Aarhus" target="_blank" rel="noopener">Kort</a></div>',
-    'contact', { max:0.2 });
-  contact.el.querySelectorAll('a').forEach(function(a){ a.addEventListener('pointerdown', function(e){ e.stopPropagation(); }); });
-  place(contact, 0.78, 0.72);
+  makeCluster('Program', '', PROGRAM, 0.20, 0.46);
+  makeCluster('Arkiv', '', ARKIV, 0.78, 0.34);
 
   // MEDIE-BOKS: tap på et kollagebillede -> stort i midten; træk -> en kopi rives ud og kan køres rundt.
   function spawnMedia(id, opts){
