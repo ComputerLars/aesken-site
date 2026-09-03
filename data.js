@@ -31,7 +31,8 @@ window.PROGRAM = [
       status: "", statusLabel: "Sep.–dec. 2026",
       blurb: "En hjemmestrikket term fra Asger Jorn, et forsøg på at forstå den kunstneriske produktion som en processuel, erfaringsbaseret sætten-i-situation. Hvornår går en situation fra at være kunstnerisk til politisk, og hvilket korrektiv kan den tilbyde diskursen om stedsspecificitet?",
       items: [
-        { when: "12. sep", what: "Situlogi som kunstnerisk metode", sub: "Udstilling v. lektor Jørn Erslev Andersen" },
+        { when: "12. sep", what: "Sådan rent situgrafisk set", sub: "Fernisering kl. 16-19 og bogudgivelse v. lektor Jørn Erslev Andersen, 49 in situ-fotos og ordæsker efter Asger Jorns situgrafi. Signeres på dagen med dedikation, gratis" },
+        { when: "19. sep", what: "Situlogi som kunstnerisk metode", sub: "Workshop med korte introer til situgrafi, situlogi, situationisme og kunstens kontraværdi, efterfulgt af åbne samtaler om deres kunstkritiske aktualitet" },
         { when: "Dec", what: "We are no Ordinary Bombers", sub: "Radiospil v. Tamar Guimarães og Organ for de Autonome Videnskaber" },
         { when: "TBA", tba: true, what: "Debatarrangement", sub: "Situlogi og stedsspecificitet" }
       ]
