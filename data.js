@@ -31,7 +31,18 @@ window.PROGRAM = [
       status: "", statusLabel: "Sep.–dec. 2026",
       blurb: "En hjemmestrikket term fra Asger Jorn, et forsøg på at forstå den kunstneriske produktion som en processuel, erfaringsbaseret sætten-i-situation. Hvornår går en situation fra at være kunstnerisk til politisk, og hvilket korrektiv kan den tilbyde diskursen om stedsspecificitet?",
       items: [
-        { when: "12. sep", what: "Sådan rent situgrafisk set", sub: "Fernisering kl. 16-19 og bogudgivelse v. lektor Jørn Erslev Andersen, 49 in situ-fotos og ordæsker efter Asger Jorns situgrafi. Signeres på dagen med dedikation, gratis" },
+        { when: "12. sep", what: "Sådan rent situgrafisk set",
+          sub: "Fernisering kl. 16-19 og bogudgivelse v. lektor Jørn Erslev Andersen. Signeres på dagen med dedikation, gratis",
+          img: "img/situlogi-erslev.jpg",
+          body: [
+            "Tid: 12. september kl. 16-19",
+            "Sted: Kunstrum ÆSKEN, Ny Munkegade 24, 8000 Aarhus C",
+            "Begivenhed: Fernisering af udstilling om Jørn Erslev Andersen fotobog ”Sådan rent situgrafisk set”, der udkommer på dagen støttet af Aarhus Kommunes Kulturudviklingspulje. I dagens anledning fås den signeret med dedikation til ingen penge. Den 19. september danner den afsæt for en workshop på ÆSKEN med korte introer til emner om situgrafi, situlogi, situationisme og kunstens kontraværdi efterfulgt af åbne samtaler om deres mulige dagsaktuelle relevans i et kunstkritisk sigte.",
+            "Hvad du kan forvente:",
+            "På æskeområdets definerede domæne låner vi kunstbetegnelsen ’situgrafi’ af Asger Jorn, der også taler om ’situmetri’, som ingen ved hvad er, så vi holder os for en sikkerheds skyld til det situgrafiske med 49 in situ-fotos og ordæsker under indtryk af Jorns velkendte fordring om at sætte i situation. Situ betyder sted. I dette øjebliks øjeblikkelige æskesituation er in situ lige her og nu.",
+            "Hermed er der hverken sagt for lidt eller for meget i retning af hvad Jorn i essayet ”Den åbne skaben og dens fjender” fra 1960 kalder det unikkes transformative morfologi i en gnomisk definition af et andet af hans kunstord, som er ’situlogi’ og som er skrevet bag øret for denne udstilling.",
+            "Det forekommer lige nu og her at svare til en given hændelses kunstneriske singularitet dannet gennem morfologisk transformation af en given situation ved hjælp af 49 situ-fotos i situations-sættende ordæsker af poetisk lokaliserende art, der aura-løst transcenderer og udæsker det rent situationelle i retning af en øjeblikkelig tankesituation, i hvilken ting, rum, tid og betydning sådan rent situgrafisk set lader sig skitsere og figurere. In situ intet mindre end 49 gange inkl. fraktion og håndbremse."
+          ] },
         { when: "19. sep", what: "Situlogi som kunstnerisk metode", sub: "Workshop med korte introer til situgrafi, situlogi, situationisme og kunstens kontraværdi, efterfulgt af åbne samtaler om deres kunstkritiske aktualitet" },
         { when: "Dec", what: "We are no Ordinary Bombers", sub: "Radiospil v. Tamar Guimarães og Organ for de Autonome Videnskaber" },
         { when: "TBA", tba: true, what: "Debatarrangement", sub: "Situlogi og stedsspecificitet" }

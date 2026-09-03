@@ -3,6 +3,7 @@
    Videoer (.mp4/.webm/.mov) genkendes automatisk. Rækkefølgen er ligegyldig.
    To ADD media: drop the file into img/feed/ and add its filename to this list. */
 window.MEDIA_FILES = [
+  "situlogi-erslev.jpg",
   "17848257267524279.jpg",
   "17853804651570443.jpg",
   "17858418171488787.jpg",

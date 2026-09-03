@@ -132,6 +132,12 @@
   .detail li .w { font-family: var(--mono); font-size: .56rem; letter-spacing: .1em; text-transform: uppercase; opacity: .9; padding-top: .2em; }
   .detail li .w.tba { color: var(--accent); opacity: 1; }
   .detail li .t b { font-weight: 500; font-size: .92rem; }
+  .detail li.has-more { cursor: pointer; }
+  .detail li.has-more > .leafbtn { display: contents; background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .detail li.has-more .t b { border-bottom: 1px dotted var(--accent); }
+  .detail li.has-more .t b::after { content: ' \2192'; color: var(--accent); font-family: var(--mono); font-size: .72em; }
+  .detail .leafimg { display: block; width: 100%; height: auto; margin: 0 0 14px; border: 1px solid rgba(255,255,255,.28); }
+  .detail .permalink { font-family: var(--mono); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; opacity: .55; margin-top: 16px; word-break: break-all; }
   .detail li .t span { display: block; font-size: .82rem; opacity: .85; margin-top: 2px; line-height: 1.4; }
   .detail .thlab, .prose .thlab { font-family: var(--mono); font-size: .54rem; letter-spacing: .22em; text-transform: uppercase; opacity: .8; margin: 14px 0 8px; }
   .thumbs { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -462,11 +468,62 @@
     omState.ref = pb;
   }
 
+  function slugify(t){
+    return (t||'').toLowerCase()
+      .replace(/\u00e6/g,'ae').replace(/\u00f8/g,'oe').replace(/\u00e5/g,'aa')
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  }
+
+  function spawnLeaf(u, it, fromBox){
+    var slug = u.id + '/' + slugify(it.what);
+    var body = it.body ? (typeof it.body === 'string' ? [it.body] : it.body) : [];
+    var html =
+      '<div class="hd"><div><div class="dk">'+esc(it.when)+'</div><h3 class="dt">'+esc(it.what)+'</h3>'
+      + '<div class="dm">'+esc(u.title)+'</div>'
+      + '</div><button class="x" aria-label="Luk">&times;</button></div>'
+      + '<div class="body">'
+      + (it.img ? '<img class="leafimg" loading="lazy" alt="" src="'+esc(it.img)+'">' : '')
+      + body.map(function(t){ return '<p class="db">'+esc(t)+'</p>'; }).join('')
+      + '<div class="permalink">antipolitik.dk/#'+esc(slug)+'</div>'
+      + '</div>';
+    var b = makeBox(html, 'detail leaf', { max:0.16, jit:0.009 });
+    logoify(b.el.querySelector('.body'));
+    try { history.replaceState(null, '', '#'+slug); } catch(e){}
+    b.el.querySelector('.x').addEventListener('click', function(e){
+      e.stopPropagation(); removeBox(b);
+      if ((location.hash||'').slice(1) === slug) { try { history.replaceState(null,'',location.pathname); } catch(e2){} }
+    });
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var fx = fromBox ? (fromBox.x + fromBox.w/2)/W : rnd(.3,.7);
+    var fy = fromBox ? (fromBox.y + fromBox.h/2)/H : rnd(.35,.65);
+    place(b, clamp(fx + rnd(-.08,.08), .15, .85), clamp(fy + rnd(-.06,.06), .15, .8));
+    return b;
+  }
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      var h = (location.hash||'').replace(/^#/,'');
+      if (!h) return;
+      var parts = h.split('/');
+      var u = (window.PROGRAM||[]).filter(function(x){ return x.id === parts[0]; })[0];
+      if (!u) return;
+      var db = spawnDetail(u, null);
+      if (parts[1]) {
+        var it = (u.items||[]).filter(function(x){ return slugify(x.what) === parts[1]; })[0];
+        if (it) spawnLeaf(u, it, db);
+      }
+    }, 800);
+  });
+
   // detalje-boks (streng/arkiv/leaf)
   function spawnDetail(u, fromBox){
-    var items = (u.items||[]).map(function(it){
-      return '<li><span class="w '+(it.tba?'tba':'')+'">'+esc(it.when)+'</span>'
-           + '<span class="t"><b>'+esc(it.what)+'</b>'+(it.sub?'<span>'+esc(it.sub)+'</span>':'')+'</span></li>';
+    var items = (u.items||[]).map(function(it, i){
+      var hasMore = !!(it.body||it.img);
+      var inner = '<span class="w '+(it.tba?'tba':'')+'">'+esc(it.when)+'</span>'
+           + '<span class="t"><b>'+esc(it.what)+'</b>'+(it.sub?'<span>'+esc(it.sub)+'</span>':'')+'</span>';
+      return hasMore
+        ? '<li class="has-more"><button class="real leafbtn" type="button" data-i="'+i+'">'+inner+'</button></li>'
+        : '<li>'+inner+'</li>';
     }).join('');
     var html =
       '<div class="hd"><div><div class="dk">'+esc(u.kind)+'</div><h3 class="dt">'+esc(u.title)+'</h3>'
@@ -482,6 +539,13 @@
     var b = makeBox(html, 'detail', { max:0.16, jit:0.009 });
     logoify(b.el.querySelector('.body'));
     b.el.querySelector('.x').addEventListener('click', function(e){ e.stopPropagation(); removeBox(b); });
+    b.el.querySelectorAll('button.leafbtn').forEach(function(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var it = (u.items||[])[+btn.getAttribute('data-i')];
+        if (it) spawnLeaf(u, it, b);
+      });
+    });
     b.el.querySelectorAll('.thumbs .th').forEach(function(btn){
       btn.addEventListener('click', function(e){ e.stopPropagation(); spawnMedia(btn.dataset.id, { from: b }); });
     });
