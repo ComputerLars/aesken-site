@@ -8,6 +8,7 @@
 <meta property="og:title" content="Kunstrum ÆSKEN">
 <meta property="og:description" content="Et taberna spiritus, det sidste stop inden universitetet. Ny Munkegade 24, Aarhus.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://antipolitik.dk/img/situlogi-erslev.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@100;300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -500,7 +501,7 @@
     return b;
   }
 
-  window.addEventListener('load', function(){
+  document.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){
       var h = (location.hash||'').replace(/^#/,'');
       if (!h) return;
@@ -512,7 +513,7 @@
         var it = (u.items||[]).filter(function(x){ return slugify(x.what) === parts[1]; })[0];
         if (it) spawnLeaf(u, it, db);
       }
-    }, 800);
+    }, 120);
   });
 
   // detalje-boks (streng/arkiv/leaf)
