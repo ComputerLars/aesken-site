@@ -137,6 +137,10 @@
   .detail li.has-more > .leafbtn { display: contents; background: none; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
   .detail li.has-more .t b { border-bottom: 1px dotted var(--accent); }
   .detail li.has-more .t b::after { content: ' \2192'; color: var(--accent); font-family: var(--mono); font-size: .72em; }
+  .detail.leaf { width: min(92vw, 1020px); }
+  .detail.leaf .body { padding: 22px 30px 30px; }
+  .detail.leaf .db { font-size: 1.5rem; line-height: 1.45; max-width: none; font-weight: 300; }
+  .detail.leaf .dt { font-size: 2rem; }
   .detail .leafimg { display: block; width: 100%; height: auto; margin: 0 0 14px; border: 1px solid rgba(255,255,255,.28); }
   .detail .permalink { font-family: var(--mono); font-size: .54rem; letter-spacing: .14em; text-transform: uppercase; opacity: .55; margin-top: 16px; word-break: break-all; }
   .detail li .t span { display: block; font-size: .82rem; opacity: .85; margin-top: 2px; line-height: 1.4; }
@@ -487,7 +491,7 @@
       + body.map(function(t){ return '<p class="db">'+esc(t)+'</p>'; }).join('')
       + '<div class="permalink">antipolitik.dk/#'+esc(slug)+'</div>'
       + '</div>';
-    var b = makeBox(html, 'detail leaf', { max:0.16, jit:0.009 });
+    var b = makeBox(html, 'detail leaf', { max:0.62, jit:0.004 });
     logoify(b.el.querySelector('.body'));
     try { history.replaceState(null, '', '#'+slug); } catch(e){}
     b.el.querySelector('.x').addEventListener('click', function(e){
